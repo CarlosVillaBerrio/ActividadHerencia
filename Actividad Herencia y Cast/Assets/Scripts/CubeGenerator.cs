@@ -8,8 +8,8 @@ using TMPro;
 public class CubeGenerator : MonoBehaviour
 {
     static System.Random r = new System.Random();
-    public readonly int limiteMinimo = r.Next(20,35);
-    const int limiteMaximo = 50;
+    public readonly int limiteMinimo = r.Next(5,15);
+    const int limiteMaximo = 25;
     int nAlly = 0, nEnemy = 0, limiteGenerado,generadorRandom;
     // HEROE VARIABLES Y FUNCION GENERADORA
     public GameObject cuboHeroe;
@@ -61,7 +61,7 @@ public class CubeGenerator : MonoBehaviour
         zombie.GetComponent<Rigidbody>().freezeRotation = true;
 
         mensajeZombi = Instantiate(mensaje);
-        mensajeZombi.name = "Mensaje Zombi";
+        mensajeZombi.name = "Mensaje";
         mensajeZombi.transform.SetParent(zombie.transform);
         mensajeZombi.transform.localPosition = Vector3.zero;
         mensajeZombi.transform.localPosition = Vector3.up;
@@ -96,16 +96,16 @@ public class CubeGenerator : MonoBehaviour
         aldeano.GetComponent<Transform>().localScale = new Vector3(1.0f, 2.0f, 1.0f); // ASIGNA UN COLOR PARA IDENTIFICAR A LOS ALDEANOS
         aldeano.AddComponent<Rigidbody>().freezeRotation = true; // AÑADE CUERPO SOLIDO AL ZOMBIE Y CONGELA LA ROTACION 
         aldeano.name = "Aldeano"; // NOMBRE DEL ALDEANO EN LA JERARQUIA
+        aldeano.transform.SetParent(aliados.transform);
 
         mensajeAldeano = Instantiate(mensaje);
-        mensajeAldeano.name = "Mensaje Aldeano";
-        mensajeAldeano.transform.SetParent(aliados.transform);
+        mensajeAldeano.name = "Mensaje";
+        mensajeAldeano.transform.SetParent(aldeano.transform);
         mensajeAldeano.transform.localPosition = Vector3.zero;
         mensajeAldeano.transform.localPosition = Vector3.up;
         aldeano.AddComponent<MyVillager>();
 
         mensajeAldeano.GetComponent<TextMesh>().text = "Hola soy " + aldeano.GetComponent<MyVillager>().datosAldeano.nombreAldeano.ToString() + " y tengo " + aldeano.GetComponent<MyVillager>().datosAldeano.edadAldeano.ToString() + " años";
-
     }
 
     void Start()
@@ -132,14 +132,14 @@ public class CubeGenerator : MonoBehaviour
         }
 
         // CREACION DE LOS ALDEANOS
-        //allys = new GameObject();
-        //allys.name = "Allys";
-        //for (int i = 0; i < nAlly; i++) // CICLO QUE CREA UN ALDEANO POR CADA ITERACION
-        //{
-        //    CreacionAldeano(allys);
-        //}
+        allys = new GameObject();
+        allys.name = "Allys";
+        for (int i = 0; i < nAlly; i++) // CICLO QUE CREA UN ALDEANO POR CADA ITERACION
+        {
+            CreacionAldeano(allys);
+        }
 
-        
+
     }
 
     void Update()

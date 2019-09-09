@@ -18,11 +18,13 @@ public class NPCRegulator : MonoBehaviour
     public Vector3 direction;
     Vector3 dPlayer;
     Vector3 dZombi;
+    Vector3 dAldeano;
     public float distanciaAJugador;
     public float distanciaAZombi;
-
-    GameObject mensajeZombi;
-    GameObject mensajeAldeano;
+    public float distanciaAldeano;
+    public float tiempo = 3.0f;
+    public GameObject mensajeZombi;
+    public GameObject mensajeAldeano;
 
 
     public void PerseguirVictima(ZombieStruct zs)
@@ -38,13 +40,22 @@ public class NPCRegulator : MonoBehaviour
             Component bComponent = aGameObject.GetComponent<MyVillager>();
             if (bComponent != null)
                 villagerObject = aGameObject;
-        }
 
-        if (distanciaAJugador <= distanciaVictima)
+            Component cComponent = aGameObject.GetComponent<MyZombie>();
+            if (cComponent != null)
+                zombiObject = aGameObject;
+        }
+        
+        if (distanciaAldeano <= distanciaVictima)
+        {
+            direction = Vector3.Normalize(villagerObject.transform.position - transform.localPosition);
+            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;
+        }
+        else if (distanciaAJugador <= distanciaVictima)
         {
             direction = Vector3.Normalize(heroObject.transform.position - transform.localPosition);
-            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;   
-        }
+            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;
+        }        
     }
 
     public IEnumerator ComportamientoZombie(ZombieStruct gameStruct)
@@ -53,11 +64,18 @@ public class NPCRegulator : MonoBehaviour
         {
             dPlayer = heroObject.transform.position - transform.position;
             distanciaAJugador = dPlayer.magnitude;
+            dAldeano = villagerObject.transform.position - transform.position;
+            distanciaAldeano = dAldeano.magnitude;
+
             if (mensajeZombi == null)
             {
-                mensajeZombi = GameObject.Find("Mensaje Zombi");
-            }
-            if (distanciaAJugador <= distanciaVictima)
+                mensajeZombi = GameObject.Find("Mensaje");
+
+                mensajeZombi.GetComponent<TextMesh>().text = "Waaaarrrr quiero comer " + gameObject.GetComponent<MyZombie>().datosZombie.gustoZombi.ToString();
+
+            }            
+
+            if (distanciaAJugador <= distanciaVictima || distanciaAldeano <= distanciaVictima)
             {
                 victimaCercana = true;
             }
@@ -65,6 +83,7 @@ public class NPCRegulator : MonoBehaviour
             {
                 victimaCercana = false;
             }
+
             if (victimaCercana == true)
             {
                 gameStruct.estadoZombi = ZombieStruct.estadosZombi.Pursuing;
@@ -111,13 +130,12 @@ public class NPCRegulator : MonoBehaviour
             if (bComponent != null)
                 zombiObject = aGameObject;
         }
-
+        
         if (distanciaAZombi <= distanciaVictima)
         {
             direction = Vector3.Normalize(zombiObject.transform.position - transform.localPosition);
-            transform.position -= direction * als.velocidadAldeano * (15 / (float)als.edadAldeano) * Time.deltaTime;
-        }
-        
+            transform.position += -1 * direction * als.velocidadAldeano * (15 / (float)als.edadAldeano) * Time.deltaTime;
+        }       
     }
     public IEnumerator ComportamientoAldeano(VillagerStruct gameStruct)
     {
@@ -130,7 +148,7 @@ public class NPCRegulator : MonoBehaviour
 
             if (mensajeAldeano == null)
             {
-                mensajeAldeano = GameObject.Find("Mensaje Aldeano");
+                mensajeAldeano = GameObject.Find("Mensaje");
             }
 
             if (distanciaAZombi <= distanciaVictima)
@@ -179,14 +197,4 @@ public class NPCRegulator : MonoBehaviour
             yield return new WaitForSeconds(3.0f); // Espera 3 segundos y cambia de comportamiento
         }
     }    
-
-    void Start()
-    {
-        
-    }
-    
-    void Update()
-    {
-        
-    }
 }
