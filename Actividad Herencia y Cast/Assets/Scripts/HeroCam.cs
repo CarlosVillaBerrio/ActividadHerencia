@@ -8,6 +8,7 @@ public class HeroCam : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0) return;
         FuncionCamara();
     }
 

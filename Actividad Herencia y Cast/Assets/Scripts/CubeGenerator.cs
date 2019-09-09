@@ -8,8 +8,8 @@ using TMPro;
 public class CubeGenerator : MonoBehaviour
 {
     static System.Random r = new System.Random();
-    public readonly int limiteMinimo = r.Next(5,15);
-    const int limiteMaximo = 25;
+    public readonly int limiteMinimo = r.Next(20,35);
+    const int limiteMaximo = 50;
     int nAlly = 0, nEnemy = 0, limiteGenerado,generadorRandom;
     // HEROE VARIABLES Y FUNCION GENERADORA
     public GameObject cuboHeroe;
@@ -21,13 +21,17 @@ public class CubeGenerator : MonoBehaviour
     GameObject enemys;
     GameObject allys;
 
+    public GameObject heroObject;
+
+
     public TextMeshProUGUI nEnemigos; 
     public TextMeshProUGUI nAliados;
+    
 
     public void CreacionHeroe()
     {
         // CREACION DEL HEROE
-        posHero = new Vector3(Random.Range(-10.0f, 10.0f), 0.0f, Random.Range(-10.0f, 10.0f));
+        posHero = new Vector3(Random.Range(-40.0f, -34.0f), 0.0f, Random.Range(-40.0f, -34.0f));
         heroe = GameObject.Instantiate(cuboHeroe, posHero, Quaternion.identity);
         heroe.name = "Heroe";
         heroe.AddComponent<MyHero>();
@@ -44,15 +48,27 @@ public class CubeGenerator : MonoBehaviour
     // ZOMBIE VARIABLES Y FUNCION GENERADORA
     int colorZombie;
     public GameObject zombie;
+    public GameObject mensaje;
+    public GameObject mensajeZombi;
     public void CreacionZombie(GameObject enemigos)
     {
         zombie = GameObject.CreatePrimitive(PrimitiveType.Cube);
         zombie.name = "Zombie";
         zombie.transform.SetParent(enemigos.transform);
-        zombie.AddComponent<MyZombie>();
-        Vector3 posZombi = new Vector3(Random.Range(-10.0f, 10.0f), 0.0f, Random.Range(-10.0f, 10.0f));
+        Vector3 posZombi = new Vector3(Random.Range(-14.0f, 14.0f), 0.0f, Random.Range(-14.0f, 14.0f));
         zombie.transform.position = posZombi;
+        zombie.AddComponent<Rigidbody>();
+        zombie.GetComponent<Rigidbody>().freezeRotation = true;
 
+        mensajeZombi = Instantiate(mensaje);
+        mensajeZombi.name = "Mensaje Zombi";
+        mensajeZombi.transform.SetParent(zombie.transform);
+        mensajeZombi.transform.localPosition = Vector3.zero;
+        mensajeZombi.transform.localPosition = Vector3.up;
+        
+        zombie.AddComponent<MyZombie>();
+        mensajeZombi.GetComponent<TextMesh>().text = "Waaaarrrr quiero comer " + zombie.GetComponent<MyZombie>().datosZombie.gustoZombi.ToString();
+        
         switch (zombie.GetComponent<MyZombie>().datosZombie.colorZombi)
         {
             case 0:
@@ -65,12 +81,12 @@ public class CubeGenerator : MonoBehaviour
                 zombie.GetComponent<Renderer>().material.color = Color.magenta;
                 break;
         }
-        zombie.AddComponent<Rigidbody>();
-        zombie.GetComponent<Rigidbody>().freezeRotation = true;
+        
         
     }
     // ALDEANO VARIABLES Y FUNCION GENERADORA
     public GameObject aldeano;
+    public GameObject mensajeAldeano;
     public void CreacionAldeano(GameObject aliados)
     {
         aldeano = GameObject.CreatePrimitive(PrimitiveType.Cube); // CREA LA FIGURA SOLICITADA
@@ -80,13 +96,21 @@ public class CubeGenerator : MonoBehaviour
         aldeano.GetComponent<Transform>().localScale = new Vector3(1.0f, 2.0f, 1.0f); // ASIGNA UN COLOR PARA IDENTIFICAR A LOS ALDEANOS
         aldeano.AddComponent<Rigidbody>().freezeRotation = true; // AÑADE CUERPO SOLIDO AL ZOMBIE Y CONGELA LA ROTACION 
         aldeano.name = "Aldeano"; // NOMBRE DEL ALDEANO EN LA JERARQUIA
-        aldeano.transform.SetParent(aliados.transform);
+
+        mensajeAldeano = Instantiate(mensaje);
+        mensajeAldeano.name = "Mensaje Aldeano";
+        mensajeAldeano.transform.SetParent(aliados.transform);
+        mensajeAldeano.transform.localPosition = Vector3.zero;
+        mensajeAldeano.transform.localPosition = Vector3.up;
         aldeano.AddComponent<MyVillager>();
-        
+
+        mensajeAldeano.GetComponent<TextMesh>().text = "Hola soy " + aldeano.GetComponent<MyVillager>().datosAldeano.nombreAldeano.ToString() + " y tengo " + aldeano.GetComponent<MyVillager>().datosAldeano.edadAldeano.ToString() + " años";
+
     }
 
     void Start()
     {
+
         limiteGenerado = Random.Range(limiteMinimo, limiteMaximo);
         for (int i = 0; i < limiteGenerado; i++)
         {
@@ -96,6 +120,8 @@ public class CubeGenerator : MonoBehaviour
             if (generadorRandom == 1)
                 nAlly++;
         }
+        // CREACION DEL HEROE
+        CreacionHeroe();
 
         // CREACION DE LOS ZOMBIS
         enemys = new GameObject();
@@ -106,16 +132,14 @@ public class CubeGenerator : MonoBehaviour
         }
 
         // CREACION DE LOS ALDEANOS
-        allys = new GameObject();
-        allys.name = "Allys";
-        for (int i = 0; i < nAlly; i++) // CICLO QUE CREA UN ALDEANO POR CADA ITERACION
-        {
-            CreacionAldeano(allys);
-        }
+        //allys = new GameObject();
+        //allys.name = "Allys";
+        //for (int i = 0; i < nAlly; i++) // CICLO QUE CREA UN ALDEANO POR CADA ITERACION
+        //{
+        //    CreacionAldeano(allys);
+        //}
 
-        // CREACION DEL HEROE
-        CreacionHeroe();
-
+        
     }
 
     void Update()

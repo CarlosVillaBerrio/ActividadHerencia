@@ -4,6 +4,7 @@
     {
         using UnityEngine;
         using System.Collections;
+        using NPC.Enemy;
         public struct VillagerStruct
         {
             // Datos del aldeano
@@ -17,6 +18,17 @@
             public enum estadosAldeano { Idle, Moving, Rotating, Running};
             public estadosAldeano estadoAldeano;
             public float velocidadAldeano;
+
+            public static explicit operator ZombieStruct(VillagerStruct md1)
+            {
+                ZombieStruct despuesStruct = new ZombieStruct();
+                despuesStruct.edadZombi = md1.edadAldeano;
+                despuesStruct.velocidadZombi = md1.velocidadAldeano;
+                despuesStruct.colorZombi = Random.Range(0, 3);
+                despuesStruct.gustoZombi = (ZombieStruct.gustosZombi)Random.Range(0, 5);
+
+                return despuesStruct;
+            }
         }
         public class MyVillager : NPCRegulator
         {
@@ -26,11 +38,22 @@
             {
                 datosAldeano.nombreAldeano = (VillagerStruct.nombresAldeano)Random.Range(0, 20); // SELECTOR DE NOMBRES
                 datosAldeano.edadAldeano = Random.Range(15, 101); // SELECTOR DE EDAD
-                datosAldeano.velocidadAldeano = 7.0f;
+                datosAldeano.velocidadAldeano = 4.0f;
+            }
+
+            private void OnCollisionEnter(Collision collision) // CONTACTO QUE CONVIERTE ALDEANO A ZOMBI
+            {
+                if (collision.transform.name == "Zombie")
+                {
+                    ZombieStruct zombieStruct = gameObject.AddComponent<MyZombie>().datosZombie;
+                    zombieStruct = (ZombieStruct)gameObject.GetComponent<MyVillager>().datosAldeano;
+                    Destroy(gameObject.GetComponent<MyVillager>());
+                }
             }
 
             void Start()
             {
+                HuirAgresor(datosAldeano);
                 StartCoroutine(ComportamientoAldeano(datosAldeano));
             }
 
@@ -59,11 +82,7 @@
                 {
                     HuirAgresor(datosAldeano);
                 }
-            }
-            public void HuirAgresor(VillagerStruct datosAldeano)
-            {
-
-            }
+            }            
         }
     }
 }

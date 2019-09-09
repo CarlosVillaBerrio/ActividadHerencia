@@ -7,6 +7,7 @@ public class HeroMove : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0) return;
         FuncionMovimiento(); 
     }
 

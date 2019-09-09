@@ -2,16 +2,32 @@
 using System;
 using NPC.Enemy;
 using NPC.Ally;
-
+using TMPro;
 public class MyHero : MonoBehaviour
 {
     static System.Random r = new System.Random();
-    public readonly float velHeroe = (float)r.NextDouble()*8;
+    //public readonly float velHeroe = (float)r.NextDouble()*8;
+    public readonly float velHeroe = 8.0f;
 
     VillagerStruct datosAldeano;
     ZombieStruct datosZombie;
     bool contactoZombi;
     bool contactoAldeano;
+    public GameObject mensajito;
+
+
+    private void Start()
+    {
+        var mensajitos = FindObjectsOfType<GameObject>();
+        foreach (var item in mensajitos)
+        {
+            if (item.name == "Mensaje Final")
+            {
+                mensajito = item;
+                mensajito.SetActive(false);
+            }
+        }
+    }
 
     void Update()
     {
@@ -41,6 +57,11 @@ public class MyHero : MonoBehaviour
         {
             contactoZombi = true;
             datosZombie = collision.gameObject.GetComponent<MyZombie>().datosZombie; // Esto va en el colision de cada zombie o aldeano
+            Debug.Log("Game Over");
+            mensajito.SetActive(true);
+            // aqui voy saque el game over cuando lo toquen
+            Time.timeScale = 0;
+
         }
     }
 

@@ -4,6 +4,7 @@
     {
         using UnityEngine;
         using System.Collections;
+        
 
         public struct ZombieStruct
         {
@@ -19,31 +20,32 @@
         public class MyZombie : NPCRegulator
         {
             public ZombieStruct datosZombie;
-
-            GameObject heroObject;
-
+   
             public void Awake()
             {
                 datosZombie.gustoZombi = (ZombieStruct.gustosZombi)Random.Range(0, 5);
                 datosZombie.colorZombi = Random.Range(0, 3);
                 datosZombie.edadZombi = Random.Range(15, 101);
-                datosZombie.velocidadZombi = 5.5f;
+                datosZombie.velocidadZombi = 2.5f;
             }
+            
             void Start()
             {
+                PerseguirVictima(datosZombie);
                 StartCoroutine(ComportamientoZombie(datosZombie));
+                
             }
 
-            public void PerseguirVictima(ZombieStruct datosZombie)
+            void OnDrawGizmos()
             {
-                // Buscar como calcular la distancia entre 2 objetos
-
+                Gizmos.DrawLine(transform.localPosition, transform.localPosition + direction);
             }
-
             
 
             void Update()
             {
+                if (Time.timeScale == 0) return;
+
                 if (seMueveZ == 0) { } // Idle
 
                 if (seMueveZ == 1) // Moving
@@ -66,6 +68,7 @@
                 if (seMueveZ == 3) // Pursuing
                 {
                     PerseguirVictima(datosZombie);
+                    
                 }
             }
         }
