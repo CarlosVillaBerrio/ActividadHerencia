@@ -47,6 +47,7 @@
                 if (collision.transform.name == "Zombie")
                 {
                     mensajeAldeano.SetActive(true);
+
                     ZombieStruct zombieStruct = gameObject.AddComponent<MyZombie>().datosZombie;
                     zombieStruct = (ZombieStruct)gameObject.GetComponent<MyVillager>().datosAldeano;
                     
@@ -63,7 +64,8 @@
                             break;
                     }
                     gameObject.name = "Zombie";
-                    
+
+                    StopAllCoroutines();
                     Destroy(gameObject.GetComponent<MyVillager>());
                     
                 }
@@ -71,7 +73,7 @@
 
             void Start()
             {
-                HuirAgresor(datosAldeano);
+                VerificarAgresor();
                 StartCoroutine(ComportamientoAldeano(datosAldeano));
             }
 
@@ -103,6 +105,7 @@
 
                 if (seMueveV == 3) // Running
                 {
+                    VerificarAgresor();
                     HuirAgresor(datosAldeano);
                 }
             }            
