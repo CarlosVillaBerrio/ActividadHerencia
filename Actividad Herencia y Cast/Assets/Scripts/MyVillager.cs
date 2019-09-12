@@ -26,6 +26,7 @@
                 despuesStruct.velocidadZombi = md1.velocidadAldeano;
                 despuesStruct.colorZombi = Random.Range(0, 3);
                 despuesStruct.gustoZombi = (ZombieStruct.gustosZombi)Random.Range(0, 5);
+                
 
                 return despuesStruct;
             }
@@ -45,16 +46,40 @@
             {
                 if (collision.transform.name == "Zombie")
                 {
+                    mensajeAldeano.SetActive(true);
+
                     ZombieStruct zombieStruct = gameObject.AddComponent<MyZombie>().datosZombie;
                     zombieStruct = (ZombieStruct)gameObject.GetComponent<MyVillager>().datosAldeano;
+                    
+                    switch (gameObject.GetComponent<MyZombie>().datosZombie.colorZombi)
+                    {
+                        case 0:
+                            gameObject.GetComponent<Renderer>().material.color = Color.cyan;
+                            break;
+                        case 1:
+                            gameObject.GetComponent<Renderer>().material.color = Color.green;
+                            break;
+                        case 2:
+                            gameObject.GetComponent<Renderer>().material.color = Color.magenta;
+                            break;
+                    }
+                    gameObject.name = "Zombie";
+
+                    StopAllCoroutines();
                     Destroy(gameObject.GetComponent<MyVillager>());
+                    
                 }
             }
 
             void Start()
             {
-                HuirAgresor(datosAldeano);
+                VerificarAgresor();
                 StartCoroutine(ComportamientoAldeano(datosAldeano));
+            }
+
+            void OnDrawGizmos()
+            {
+                Gizmos.DrawLine(transform.localPosition, transform.localPosition + direction);
             }
 
             void Update()
@@ -80,6 +105,7 @@
 
                 if (seMueveV == 3) // Running
                 {
+                    VerificarAgresor();
                     HuirAgresor(datosAldeano);
                 }
             }            

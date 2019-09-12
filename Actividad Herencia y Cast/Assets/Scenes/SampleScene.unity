@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.4465782, g: 0.49641252, b: 0.5748167, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.4964127, b: 0.57481724, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1318,6 +1318,7 @@ MonoBehaviour:
   mensaje: {fileID: 1581057772821337897, guid: fc5a3c5e6e729e347a17d6adb231f0d0, type: 3}
   mensajeZombi: {fileID: 0}
   aldeano: {fileID: 0}
+  mensajeAldeano: {fileID: 0}
 --- !u!1 &1409643334
 GameObject:
   m_ObjectHideFlags: 0

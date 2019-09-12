@@ -9,7 +9,7 @@ public class NPCRegulator : MonoBehaviour
 {
     public bool victimaCercana = false; // Variable para accionar la persecusion del zombie
     public bool agresorCercano = false;
-    public float distanciaVictima = 15.0f;
+    public float distanciaEntreObjetos = 15.0f;
     public int seMueveZ, selectorDireccionalZ;
     public int seMueveV, selectorDireccionalV;
     GameObject heroObject;
@@ -18,46 +18,111 @@ public class NPCRegulator : MonoBehaviour
     public Vector3 direction;
     Vector3 dPlayer;
     Vector3 dZombi;
+    Vector3 dAldeano;
     public float distanciaAJugador;
     public float distanciaAZombi;
+    public float distanciaAldeano;
+    public float tiempo = 3.0f;
+    public GameObject mensajeZombi;
+    public GameObject mensajeAldeano;
 
-    GameObject mensajeZombi;
-    GameObject mensajeAldeano;
-
-
-    public void PerseguirVictima(ZombieStruct zs)
+    public void ComportamientoNormal(GameObject gameObject)
     {
-        // Buscar como calcular la distancia entre 2 objetos
-        GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-        foreach (GameObject aGameObject in AllGameObjects)
-        {
-            Component aComponent = aGameObject.GetComponent<MyHero>();
-            if (aComponent != null)
-                heroObject = aGameObject;
+        if (seMueveZ == 0) { } // Idle
 
-            Component bComponent = aGameObject.GetComponent<MyVillager>();
-            if (bComponent != null)
-                villagerObject = aGameObject;
+        if (seMueveZ == 1) // Moving
+        {
+            transform.localPosition += transform.forward * gameObject.GetComponent<MyZombie>().datosZombie.velocidadZombi * (15 / (float)gameObject.GetComponent<MyZombie>().datosZombie.edadZombi) * Time.deltaTime;
         }
 
-        if (distanciaAJugador <= distanciaVictima)
+        if (seMueveZ == 2) // Rotating
         {
-            direction = Vector3.Normalize(heroObject.transform.position - transform.localPosition);
-            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;   
+            if (selectorDireccionalZ == 0) // Rotacion Positiva
+            {
+                transform.eulerAngles += new Vector3(0, Random.Range(10f, 150f) * Time.deltaTime, 0);
+            }
+            if (selectorDireccionalZ == 1) // Rotacion Negativa
+            {
+                transform.eulerAngles += new Vector3(0, Random.Range(-10f, -150f) * Time.deltaTime, 0);
+            }
         }
     }
 
+    public void VerificarVictima()
+    {
+        if (heroObject == null)
+            heroObject = GameObject.Find("Heroe");
+
+        GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        foreach (GameObject aGameObject in AllGameObjects)
+        {
+            //Component aComponent = aGameObject.GetComponent<MyHero>();
+            //if (aComponent != null)
+            //    heroObject = aGameObject;
+
+            Component bComponent = aGameObject.GetComponent<MyVillager>();
+            if (bComponent != null)
+            {
+                villagerObject = aGameObject;
+                dAldeano = villagerObject.transform.position - transform.position;
+                distanciaAldeano = dAldeano.magnitude;
+                if (distanciaAldeano <= distanciaEntreObjetos)
+                    break;
+            }
+                
+                Component cComponent = aGameObject.GetComponent<MyZombie>();
+            if (cComponent != null)
+                zombiObject = aGameObject;
+        }
+        
+               
+    }
+    public void PerseguirVictima(ZombieStruct zs)
+    {
+        if (distanciaAldeano <= distanciaEntreObjetos)
+        {
+            direction = Vector3.Normalize(villagerObject.transform.position - transform.position);
+            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;
+        }
+        else if (distanciaAJugador <= distanciaEntreObjetos)
+        {
+            direction = Vector3.Normalize(heroObject.transform.position - transform.position);
+            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;
+        }
+    }
     public IEnumerator ComportamientoZombie(ZombieStruct gameStruct)
     {
         while (true)
         {
             dPlayer = heroObject.transform.position - transform.position;
             distanciaAJugador = dPlayer.magnitude;
+
+            dAldeano = villagerObject.transform.position - transform.position;
+            distanciaAldeano = dAldeano.magnitude;
+
             if (mensajeZombi == null)
             {
-                mensajeZombi = GameObject.Find("Mensaje Zombi");
+                mensajeZombi = GameObject.Find("Mensaje");
+                mensajeZombi.GetComponent<TextMesh>().text = "Waaaarrrr quiero comer " + gameObject.GetComponent<MyZombie>().datosZombie.gustoZombi.ToString();
+
             }
-            if (distanciaAJugador <= distanciaVictima)
+            if(mensajeZombi != null)
+                mensajeZombi.GetComponent<TextMesh>().text = "Waaaarrrr quiero comer " + gameObject.GetComponent<MyZombie>().datosZombie.gustoZombi.ToString();
+
+
+            if (distanciaAJugador <= distanciaEntreObjetos)
+            {
+                mensajeZombi.SetActive(true);
+                mensajeZombi.GetComponent<TextMesh>().text = "Waaaarrrr quiero comer " + gameObject.GetComponent<MyZombie>().datosZombie.gustoZombi.ToString();
+
+                mensajeZombi.transform.rotation = heroObject.transform.rotation;
+            }
+            else
+            {
+                mensajeZombi.SetActive(false);
+            }
+                       
+            if (distanciaAJugador <= distanciaEntreObjetos || distanciaAldeano <= distanciaEntreObjetos)
             {
                 victimaCercana = true;
             }
@@ -65,16 +130,15 @@ public class NPCRegulator : MonoBehaviour
             {
                 victimaCercana = false;
             }
+
             if (victimaCercana == true)
             {
-                gameStruct.estadoZombi = ZombieStruct.estadosZombi.Pursuing;
-                mensajeZombi.SetActive(true);
-                mensajeZombi.transform.rotation = heroObject.transform.rotation;
+                gameStruct.estadoZombi = ZombieStruct.estadosZombi.Pursuing;            
             }
             else
             {
                 gameStruct.estadoZombi = (ZombieStruct.estadosZombi)Random.Range(0, 3);
-                mensajeZombi.SetActive(false);
+                
             }
             switch (gameStruct.estadoZombi)
             {
@@ -97,43 +161,66 @@ public class NPCRegulator : MonoBehaviour
         }
     }
 
-    public void HuirAgresor(VillagerStruct als)
+    public void VerificarAgresor()
     {
-        // Buscar como calcular la distancia entre 2 objetos
+        if(heroObject == null)
+        heroObject = GameObject.Find("Heroe");
+
         GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
         foreach (GameObject aGameObject in AllGameObjects)
         {
-            Component aComponent = aGameObject.GetComponent<MyHero>();
-            if (aComponent != null)
-                heroObject = aGameObject;
+            //Component aComponent = aGameObject.GetComponent<MyHero>();
+            //if (aComponent != null)
+            //    heroObject = aGameObject;
 
             Component bComponent = aGameObject.GetComponent<MyZombie>();
             if (bComponent != null)
+            {
                 zombiObject = aGameObject;
+                dZombi = zombiObject.transform.position - transform.position;
+                distanciaAZombi = dZombi.magnitude;
+                if (distanciaAZombi <= distanciaEntreObjetos)
+                    break;
+            }                
         }
-
-        if (distanciaAZombi <= distanciaVictima)
-        {
-            direction = Vector3.Normalize(zombiObject.transform.position - transform.localPosition);
-            transform.position -= direction * als.velocidadAldeano * (15 / (float)als.edadAldeano) * Time.deltaTime;
-        }
-        
     }
+
+    public void HuirAgresor(VillagerStruct als)
+    {               
+        if (distanciaAZombi <= distanciaEntreObjetos)
+        {
+            direction = Vector3.Normalize(zombiObject.transform.position - transform.position);
+            transform.position += -1 * direction * als.velocidadAldeano * (15 / (float)als.edadAldeano) * Time.deltaTime;
+        }       
+    }
+
+
     public IEnumerator ComportamientoAldeano(VillagerStruct gameStruct)
     {
         while (true)
         {
             dPlayer = heroObject.transform.position - transform.position;
             distanciaAJugador = dPlayer.magnitude;
+
             dZombi = zombiObject.transform.position - transform.position;
             distanciaAZombi = dZombi.magnitude;
 
             if (mensajeAldeano == null)
             {
-                mensajeAldeano = GameObject.Find("Mensaje Aldeano");
+                mensajeAldeano = GameObject.Find("Mensaje");
             }
 
-            if (distanciaAZombi <= distanciaVictima)
+            if (distanciaAJugador <= distanciaEntreObjetos) // Muestra el mensaje del aldeano con el heroe cerca
+            {
+                mensajeAldeano.SetActive(true);
+                mensajeAldeano.transform.rotation = heroObject.transform.rotation;
+            }
+            else
+            {
+                mensajeAldeano.SetActive(false);
+            }
+
+            if (distanciaAZombi <= distanciaEntreObjetos)
             {
                 agresorCercano = true;
             }
@@ -142,15 +229,7 @@ public class NPCRegulator : MonoBehaviour
                 agresorCercano = false;
             }
 
-            if (distanciaAJugador <= distanciaVictima) // Muestra el mensaje del aldeano con el heroe cerca
-            {
-                mensajeAldeano.SetActive(true);
-                mensajeAldeano.transform.rotation = heroObject.transform.rotation;
-            }
-            else
-            {
-                mensajeAldeano.SetActive(false);
-            }                
+                           
 
             if (agresorCercano == true)
             {
@@ -179,14 +258,4 @@ public class NPCRegulator : MonoBehaviour
             yield return new WaitForSeconds(3.0f); // Espera 3 segundos y cambia de comportamiento
         }
     }    
-
-    void Start()
-    {
-        
-    }
-    
-    void Update()
-    {
-        
-    }
 }

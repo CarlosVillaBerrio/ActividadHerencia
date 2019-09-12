@@ -11,12 +11,14 @@
             // Datos del zombi
             public int colorZombi;
             public int edadZombi;
-            public enum gustosZombi { cerebro, corazon, higado, nariz, lengua };
-            public gustosZombi gustoZombi;
             public enum estadosZombi { Idle, Moving, Rotating, Pursuing };
+            public enum gustosZombi { cerebro, corazon, higado, nariz, lengua };
+            public gustosZombi gustoZombi;           
             public estadosZombi estadoZombi;
             public float velocidadZombi;
         }
+        
+
         public class MyZombie : NPCRegulator
         {
             public ZombieStruct datosZombie;
@@ -31,7 +33,7 @@
             
             void Start()
             {
-                PerseguirVictima(datosZombie);
+                VerificarVictima();
                 StartCoroutine(ComportamientoZombie(datosZombie));
                 
             }
@@ -46,29 +48,17 @@
             {
                 if (Time.timeScale == 0) return;
 
-                if (seMueveZ == 0) { } // Idle
-
-                if (seMueveZ == 1) // Moving
-                {
-                    transform.localPosition += transform.forward * datosZombie.velocidadZombi * (15/ (float)datosZombie.edadZombi) * Time.deltaTime;
-                }
-
-                if (seMueveZ == 2) // Rotating
-                {
-                    if (selectorDireccionalZ == 0) // Rotacion Positiva
-                    {
-                        transform.eulerAngles += new Vector3(0, Random.Range(10f, 150f) * Time.deltaTime, 0);
-                    }
-                    if (selectorDireccionalZ == 1) // Rotacion Negativa
-                    {
-                        transform.eulerAngles += new Vector3(0, Random.Range(-10f, -150f) * Time.deltaTime, 0);
-                    }
-                }
+                
 
                 if (seMueveZ == 3) // Pursuing
                 {
+                    VerificarVictima();
                     PerseguirVictima(datosZombie);
-                    
+
+                }
+                else
+                {
+                    ComportamientoNormal(this.gameObject);
                 }
             }
         }
