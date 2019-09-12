@@ -5,31 +5,29 @@ using NPC.Ally;
 using TMPro;
 public class MyHero : MonoBehaviour
 {
-    static System.Random r = new System.Random();
-    //public readonly float velHeroe = (float)r.NextDouble()*8;
-    public readonly float velHeroe = 8.0f;
+    static System.Random r = new System.Random(); // VARIABLE AUXILIAR PARA ASIGNACION NATIVA DEL READONLY
+    public readonly float velHeroe = (float)r.NextDouble()*8.0f + 1.5f; // VELOCIDAD ALEATORIA DEL HEROE
 
     VillagerStruct datosAldeano;
     ZombieStruct datosZombie;
     bool contactoZombi;
     bool contactoAldeano;
     public GameObject mensajito;
-
-
+    
     private void Start()
     {
-        var mensajitos = FindObjectsOfType<GameObject>();
+        var mensajitos = FindObjectsOfType<GameObject>(); // LISTA PARA DETECTAR EL GAME OVER
         foreach (var item in mensajitos)
         {
             if (item.name == "Mensaje Final")
             {
-                mensajito = item;
-                mensajito.SetActive(false);
+                mensajito = item; // ASIGNA EL TEXTO EN EL CANVAS CON EL GAME OVER
+                mensajito.SetActive(false); // DESACTIVA EL TEXTO CAMVAS DEL GAME OVER
             }
         }
     }
 
-    void Update()
+    void Update() // CONDICIONES PARA MENSAJES POR CONTACTO
     {
         if (contactoAldeano)
         {
@@ -59,11 +57,13 @@ public class MyHero : MonoBehaviour
             datosZombie = collision.gameObject.GetComponent<MyZombie>().datosZombie; // Esto va en el colision de cada zombie o aldeano
             Debug.Log("Game Over");
             mensajito.SetActive(true);
-            // aqui voy saque el game over cuando lo toquen
-            Time.timeScale = 0;
+            // aqui saca el game over cuando lo tocan
+            Time.timeScale = 0; // EL TIMESCALE LO VUELVE CERO PARA DETENER EL JUEGO CUANDO UN ZOMBIE TOQUE AL HEROE
 
         }
     }
+
+    // FUNCIONES QUE DEVUELVEN EL MENSAJE POR CONTACTO CON EL HEROE
 
     public string MensajeZombi(ZombieStruct datosZombie)
     {

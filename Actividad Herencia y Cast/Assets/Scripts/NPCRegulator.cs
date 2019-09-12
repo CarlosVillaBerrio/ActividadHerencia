@@ -7,8 +7,7 @@ using NPC.Ally;
 
 public class NPCRegulator : MonoBehaviour
 {
-    public bool victimaCercana = false; // Variable para accionar la persecusion del zombie
-    public bool agresorCercano = false;
+    // VARIABLES REGULADORAS
     public float distanciaEntreObjetos = 15.0f;
     public int seMueve, selectorDireccional, edad, estadoActual;
     public float velocidad;
@@ -23,7 +22,7 @@ public class NPCRegulator : MonoBehaviour
     public float distanciaAZombi;
     public float distanciaAldeano;
 
-    public void ComportamientoNormal()
+    public void ComportamientoNormal() // FUNCION QUE EJECUTAN AMBOS NPC
     {
         if (estadoActual == 0) { } // Idle
 
@@ -46,7 +45,7 @@ public class NPCRegulator : MonoBehaviour
         }
     }
 
-    public IEnumerator EstadosComunes()
+    public IEnumerator EstadosComunes() // CORRUTINA QUE EJECUTAN AMBOS NPC
     {
         while (true)
         {
@@ -59,69 +58,71 @@ public class NPCRegulator : MonoBehaviour
         }
     }
 
-    public void VerificarVictima()
+    public void VerificarVictima() // VERIFICA LA DISTANCIA DE LOS OBJETOS EN LA ESCENA
     {
-        if (heroObject == null)
+        if (heroObject == null) // DETECTA POR PRIMERA VEZ AL HEROE
             heroObject = GameObject.Find("Heroe");
 
-        dPlayer = heroObject.transform.position - transform.position;
-        distanciaAJugador = dPlayer.magnitude;
+        dPlayer = heroObject.transform.position - transform.position; // CALCULA LA DISTANCIA ENTRE DOS PUNTOS
+        distanciaAJugador = dPlayer.magnitude; // DEVUELVE LA MAGNITUD DE LA DISTANCIA
 
-        GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[]; // DEVUELVE UNA LISTA DE GAMEOBJECTS DE LA ESCENA
         foreach (GameObject aGameObject in AllGameObjects)
         {
-            Component bComponent = aGameObject.GetComponent<MyVillager>();
+            Component bComponent = aGameObject.GetComponent<MyVillager>(); // BUSCA EL COMPONENTE ALDEANO Y SE LO ASIGNA AL OBJETO ALDEANO
             if (bComponent != null)
             {
                 villagerObject = aGameObject;
-                dAldeano = villagerObject.transform.position - transform.position;
-                distanciaAldeano = dAldeano.magnitude;
-                if (distanciaAldeano <= distanciaEntreObjetos)
+                dAldeano = villagerObject.transform.position - transform.position; // CALCULA LA DISTANCIA ENTRE DOS PUNTOS
+                distanciaAldeano = dAldeano.magnitude; // DEVUELVE LA MAGNITUD DE LA DISTANCIA
+                if (distanciaAldeano <= distanciaEntreObjetos) // DETIENE EL ANALISIS EN EL ALDEANO MAS CERCANO
                     break;
             }
         }
     }
 
-    public void PerseguirVictima(ZombieStruct zs)
+    public void PerseguirVictima(ZombieStruct zs) // INICIA LA PERSECUSION SI ENCUENTRA UNA VICTIMA CERCANA
     {
-        if (distanciaAldeano <= distanciaEntreObjetos)
+        estadoActual = 3;
+        if (distanciaAldeano <= distanciaEntreObjetos) // PERSIGUE PRIMERO A UN ALDEANO
         {
-            direction = Vector3.Normalize(villagerObject.transform.position - transform.position);
-            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;
+            direction = Vector3.Normalize(villagerObject.transform.position - transform.position); // BUSCA EL VECTOR DIRECCION QUE APUNTE AL OBJETO AL QUE SE DESEA LLEGAR
+            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime; // TRANSFORMA LA POSICION PARA ACERCARSE A OTRO OBJETO
         }
-        else if (distanciaAJugador <= distanciaEntreObjetos)
+        else if (distanciaAJugador <= distanciaEntreObjetos) // PERSIGUE AL HEROE SINO ENCUENTRA ALDEANOS CERCA
         {
-            direction = Vector3.Normalize(heroObject.transform.position - transform.position);
-            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime;
+            direction = Vector3.Normalize(heroObject.transform.position - transform.position); // BUSCA EL VECTOR DIRECCION QUE APUNTE AL OBJETO AL QUE SE DESEA LLEGAR
+            transform.position += direction * zs.velocidadZombi * (15 / (float)zs.edadZombi) * Time.deltaTime; // TRANSFORMA LA POSICION PARA ACERCARSE A OTRO OBJETO
         }
     }
 
-    public void VerificarAgresor()
+    public void VerificarAgresor() // VERIFICA LA DISTANCIA DE LOS OBJETOS EN LA ESCENA
     {
-        if(heroObject == null)
+        if(heroObject == null) // DETECTA POR PRIMERA VEZ AL HEROE
             heroObject = GameObject.Find("Heroe");
 
-        dPlayer = heroObject.transform.position - transform.position;
-        distanciaAJugador = dPlayer.magnitude;
+        dPlayer = heroObject.transform.position - transform.position; // CALCULA LA DISTANCIA ENTRE DOS PUNTOS
+        distanciaAJugador = dPlayer.magnitude; // DEVUELVE LA MAGNITUD DE LA DISTANCIA
 
-        GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        GameObject[] AllGameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[]; // DEVUELVE UNA LISTA DE GAMEOBJECTS DE LA ESCENA
         foreach (GameObject aGameObject in AllGameObjects)
         {
-            Component bComponent = aGameObject.GetComponent<MyZombie>();
+            Component bComponent = aGameObject.GetComponent<MyZombie>(); // BUSCA EL COMPONENTE ZOMBIE Y SE LO ASIGNA AL OBJETO ZOMBIE
             if (bComponent != null)
             {
                 zombiObject = aGameObject;
-                dZombi = zombiObject.transform.position - transform.position;
-                distanciaAZombi = dZombi.magnitude;
-                if (distanciaAZombi <= distanciaEntreObjetos)
+                dZombi = zombiObject.transform.position - transform.position; // CALCULA LA DISTANCIA ENTRE DOS PUNTOS
+                distanciaAZombi = dZombi.magnitude; // DEVUELVE LA MAGNITUD DE LA DISTANCIA
+                if (distanciaAZombi <= distanciaEntreObjetos) // DETIENE EL ANALISIS EN EL ZOMBIE MAS CERCANO
                     break;
             }                
         }
     }
 
-    public void HuirAgresor(VillagerStruct als)
-    {       
-        direction = Vector3.Normalize(zombiObject.transform.position - transform.position);
-        transform.position += -1 * direction * als.velocidadAldeano * (15 / (float)als.edadAldeano) * Time.deltaTime;
+    public void HuirAgresor(VillagerStruct als) // FUNCION PARA ESCAPAR DEL ZOMBIE MAS CERCANO
+    {
+        estadoActual = 3;
+        direction = Vector3.Normalize(zombiObject.transform.position - transform.position); // BUSCA EL VECTOR DIRECCION QUE APUNTE AL OBJETO AL QUE SE DESEA LLEGAR
+        transform.position += -1 * direction * als.velocidadAldeano * (15 / (float)als.edadAldeano) * Time.deltaTime; // TRANSFORMA LA POSICION PARA ALEJARSE DE OTRO OBJETO
     }
 }
