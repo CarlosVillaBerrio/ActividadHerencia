@@ -8,7 +8,7 @@ using NPC.Ally;
 public class NPCRegulator : MonoBehaviour
 {
     // VARIABLES REGULADORAS
-    public float distanciaEntreObjetos = 15.0f;
+    public float distanciaEntreObjetos = 5.0f;
     public int seMueve, selectorDireccional, edad, estadoActual;
     public float velocidad;
     public GameObject heroObject;
