@@ -45,11 +45,13 @@ public class CubeGenerator : MonoBehaviour
         camara.name = "Camara Heroe";
         camara.transform.SetParent(heroe.transform);
     }
+
     // ZOMBIE VARIABLES Y FUNCION GENERADORA
     int colorZombie;
     public GameObject zombie;
     public GameObject mensaje;
     public GameObject mensajeZombi;
+
     public void CreacionZombie(GameObject enemigos)
     {
         zombie = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -64,10 +66,8 @@ public class CubeGenerator : MonoBehaviour
         mensajeZombi.name = "Mensaje";
         mensajeZombi.transform.SetParent(zombie.transform);
         mensajeZombi.transform.localPosition = Vector3.zero;
-        mensajeZombi.transform.localPosition = Vector3.up;
-        
+        mensajeZombi.transform.localPosition = Vector3.up;        
         zombie.AddComponent<MyZombie>();
-        mensajeZombi.GetComponent<TextMesh>().text = "Waaaarrrr quiero comer " + zombie.GetComponent<MyZombie>().datosZombie.gustoZombi.ToString();
         
         switch (zombie.GetComponent<MyZombie>().datosZombie.colorZombi)
         {
@@ -81,9 +81,8 @@ public class CubeGenerator : MonoBehaviour
                 zombie.GetComponent<Renderer>().material.color = Color.magenta;
                 break;
         }
-        
-        
     }
+
     // ALDEANO VARIABLES Y FUNCION GENERADORA
     public GameObject aldeano;
     public GameObject mensajeAldeano;
@@ -104,8 +103,6 @@ public class CubeGenerator : MonoBehaviour
         mensajeAldeano.transform.localPosition = Vector3.zero;
         mensajeAldeano.transform.localPosition = Vector3.up;
         aldeano.AddComponent<MyVillager>();
-
-        mensajeAldeano.GetComponent<TextMesh>().text = "Hola soy " + aldeano.GetComponent<MyVillager>().datosAldeano.nombreAldeano.ToString() + " y tengo " + aldeano.GetComponent<MyVillager>().datosAldeano.edadAldeano.ToString() + " años";
     }
 
     void Start()

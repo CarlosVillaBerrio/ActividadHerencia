@@ -40,17 +40,69 @@
                 datosAldeano.nombreAldeano = (VillagerStruct.nombresAldeano)Random.Range(0, 20); // SELECTOR DE NOMBRES
                 datosAldeano.edadAldeano = Random.Range(15, 101); // SELECTOR DE EDAD
                 datosAldeano.velocidadAldeano = 4.0f;
+                edad = datosAldeano.edadAldeano;
+                velocidad = datosAldeano.velocidadAldeano;
+                gameObject.GetComponentInChildren<TextMesh>().text = "Hola soy " + gameObject.GetComponent<MyVillager>().datosAldeano.nombreAldeano.ToString() + " y tengo " + gameObject.GetComponent<MyVillager>().datosAldeano.edadAldeano.ToString() + " años";
+                
+            }
+
+            void Start()
+            {
+                VerificarAgresor();
+                StartCoroutine(EstadosComunes());
+            }
+
+            void OnDrawGizmos()
+            {
+                Gizmos.DrawLine(transform.localPosition, transform.localPosition + direction);
+            }
+
+            void Update()
+            {
+                if (distanciaAZombi <= distanciaEntreObjetos)
+                {
+                    ActualizadorDeEstadoAldeano();
+                    VerificarAgresor();
+                    HuirAgresor(datosAldeano);
+                    mostrarMensaje();
+                }
+                    else
+                    {
+                        ActualizadorDeEstadoAldeano();
+                        ComportamientoNormal();
+                        VerificarAgresor();
+                        mostrarMensaje();
+                    }
+            }
+
+            public void ActualizadorDeEstadoAldeano()
+            {
+                datosAldeano.estadoAldeano = (VillagerStruct.estadosAldeano)estadoActual;
+            }
+
+            public void mostrarMensaje()
+            {
+                if (distanciaAJugador <= distanciaEntreObjetos) // Muestra el mensaje del aldeano con el heroe cerca
+                {
+                    gameObject.GetComponentInChildren<TextMesh>().text = "Hola soy " + gameObject.GetComponent<MyVillager>().datosAldeano.nombreAldeano.ToString() + " y tengo " + gameObject.GetComponent<MyVillager>().datosAldeano.edadAldeano.ToString() + " años";
+
+                    gameObject.GetComponentInChildren<TextMesh>().transform.rotation = heroObject.transform.rotation;
+                }
+                else
+                {
+                    gameObject.GetComponentInChildren<TextMesh>().text = "";
+                }
             }
 
             private void OnCollisionEnter(Collision collision) // CONTACTO QUE CONVIERTE ALDEANO A ZOMBI
             {
                 if (collision.transform.name == "Zombie")
                 {
-                    mensajeAldeano.SetActive(true);
+                    
 
                     ZombieStruct zombieStruct = gameObject.AddComponent<MyZombie>().datosZombie;
                     zombieStruct = (ZombieStruct)gameObject.GetComponent<MyVillager>().datosAldeano;
-                    
+
                     switch (gameObject.GetComponent<MyZombie>().datosZombie.colorZombi)
                     {
                         case 0:
@@ -67,48 +119,9 @@
 
                     StopAllCoroutines();
                     Destroy(gameObject.GetComponent<MyVillager>());
-                    
+
                 }
             }
-
-            void Start()
-            {
-                VerificarAgresor();
-                StartCoroutine(ComportamientoAldeano(datosAldeano));
-            }
-
-            void OnDrawGizmos()
-            {
-                Gizmos.DrawLine(transform.localPosition, transform.localPosition + direction);
-            }
-
-            void Update()
-            {
-                if (seMueveV == 0) { } // Idle
-
-                if (seMueveV == 1) // Moving
-                {
-                    transform.localPosition += transform.forward * datosAldeano.velocidadAldeano * (15 / (float)datosAldeano.edadAldeano) * Time.deltaTime;
-                }
-
-                if (seMueveV == 2) // Rotating
-                {
-                    if (selectorDireccionalV == 0) // Rotacion Positiva
-                    {
-                        transform.eulerAngles += new Vector3(0, Random.Range(10f, 150f) * Time.deltaTime, 0);
-                    }
-                    if (selectorDireccionalV == 1) // Rotacion Negativa
-                    {
-                        transform.eulerAngles += new Vector3(0, Random.Range(-10f, -150f) * Time.deltaTime, 0);
-                    }
-                }
-
-                if (seMueveV == 3) // Running
-                {
-                    VerificarAgresor();
-                    HuirAgresor(datosAldeano);
-                }
-            }            
         }
     }
 }
